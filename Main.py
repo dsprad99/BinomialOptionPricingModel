@@ -1,49 +1,40 @@
 from math import exp
 
- # Input stock parameters
+#timestep: 0.25
+dt = .25 
 
- #time interval for the binomial model
-dt = input("Enter the timestep: ")
+#initial asset price: 178.78
+S = 178.78
 
-#initial asset price (current stock price)
-S = input("Enter the initial asset price: ")
+#the risk-free discount rate: 1
+r = 1
 
-#Risk Free Discount Rate (interest rate used for discounting future cash flows)
-r = 1.03
+#option strike price: 180
+K = 180   
 
-#Option strike price
-K = input("Enter the option strike price: ")
+#the asset growth probability p: 1
+p = 1   
 
-#factor by which the underlying asset's price decreases over a single time step
-#1 is a temp val
-d = 1
+#asset growth factor u: 1.2
+u = 1.7   
 
-#Asset growth factor u (the factor by which the stock price goes up).
-u = input("Enter the asset growth factor u: ")
-
-#N: Number of timesteps until expiration (the number of time intervals until the option 
-N = input("Enter the number of timesteps until expiration: ")
-
-#Asset growth probablity (probablity the stock will go up)
-p = (exp(r * dt) - d) / (u - d)
+#the number of timesteps until expiration: 2
+N = 2   
 
 # Input whether this is a call or a put option
-call = raw_input("Is this a call or put option? (C/P) ").upper().startswith("C")
-
-
-
+call = True
 
 def price(k, us):
-# Compute the stock price after ’us’ growths and ’k - us’ decays. """
+    """ Compute the stock price after ’us’ growths and ’k - us’ decays. """
     return S * (u ** (2 * us - k))
 
 def bopm(k, us):
+    """
+    Compute the option price for a node ’k’ timesteps in the future
+    and ’us’ growth events. Note that thus there are ’k - us’ decay events.
+    """
 
-#Compute the option price for a node ’k’ timesteps in the future
-#and ’us’ growth events. Note that thus there are ’k - us’ decay events.
-#"""
-
-# Compute the exercise profit
+    # Compute the exercise profit
     stockPrice = price(k, us)
     if call: exerciseProfit = max(0, stockPrice - K)
     else: exerciseProfit = max(0, K - stockPrice)
@@ -56,7 +47,7 @@ def bopm(k, us):
     expected = p * bopm(k + 1, us + 1) + (1 - p) * bopm(k + 1, us)
     binomial = decay * expected
 
-# Assume this is an American-style option
+    # Assume this is an American-style option
     return max(binomial, exerciseProfit)
 
 print ('Computed option price: $%.2f' % bopm(0, 0))
